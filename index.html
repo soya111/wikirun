@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikiすごろく</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sugoroku.css?v=21">
+</head>
+<body>
+    <!-- Setup Screen -->
+    <div id="setup" class="setup-screen">
+        <div class="setup-container">
+            <h1 class="setup-title fade-in" style="--delay: 0">Wiki<span class="title-jp">すごろく</span></h1>
+
+            <div class="mode-selector fade-in" style="--delay: 1">
+                <label class="mode-option" data-diff="easy">
+                    <input type="radio" name="difficulty" value="easy">
+                    <span>Easy</span>
+                </label>
+                <span class="mode-sep">·</span>
+                <label class="mode-option" data-diff="normal">
+                    <input type="radio" name="difficulty" value="normal" checked>
+                    <span>Normal</span>
+                </label>
+                <span class="mode-sep">·</span>
+                <label class="mode-option" data-diff="hard">
+                    <input type="radio" name="difficulty" value="hard">
+                    <span>Hard</span>
+                </label>
+            </div>
+
+            <label class="endless-option fade-in" style="--delay: 2">
+                <input type="checkbox" id="endless-mode">
+                <span>ターン無制限</span>
+            </label>
+
+            <button id="btn-generate" class="btn-start fade-in" style="--delay: 3">はじめる</button>
+            <div id="progress" class="progress-text fade-in" style="--delay: 4"></div>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="game-screen">
+        <div class="wiki-panel">
+            <div class="wiki-header">
+                <div class="header-main">
+                    <div id="turn-info" class="turn-badge"></div>
+                    <div class="header-title-group">
+                        <div id="current-pos" class="current-pos-badge"></div>
+                        <div id="nav-status" class="nav-status"></div>
+                    </div>
+                    <div id="turns-left" class="turns-left"></div>
+                </div>
+                <div class="header-action">
+                    <button id="btn-confirm" class="btn-confirm" style="display:none">この記事に移動する</button>
+                </div>
+            </div>
+            <iframe id="wiki-frame" class="wiki-frame" sandbox="allow-scripts allow-popups"></iframe>
+        </div>
+        <div id="resizer" class="resizer"></div>
+        <div class="game-panel">
+            <div class="score-row">
+                <div id="red-card" class="score-card" data-player="red">
+                    <span class="score-icon">&#9679;</span>
+                    <span class="score-label">Red</span>
+                    <span id="red-score" class="score-num">0</span>
+                </div>
+                <div id="blue-card" class="score-card" data-player="blue">
+                    <span class="score-icon">&#9679;</span>
+                    <span class="score-label">Blue</span>
+                    <span id="blue-score" class="score-num">0</span>
+                </div>
+            </div>
+            <div class="panel-section">
+                <h3>ボード</h3>
+                <div id="board-grid" class="board-grid"></div>
+            </div>
+            <div class="panel-section">
+                <h3>タイムライン</h3>
+                <div class="tl-header">
+                    <div class="tl-label" data-player="red">Red</div>
+                    <div></div>
+                    <div class="tl-label" data-player="blue">Blue</div>
+                </div>
+                <div id="timeline" class="timeline-grid"></div>
+            </div>
+            <div class="panel-footer">
+                <button id="btn-replay" class="btn-newgame">New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Overlay -->
+    <div id="result-overlay" class="result-overlay">
+        <div class="result-card">
+            <h2 id="result-title"></h2>
+            <div id="result-score" class="final-score"></div>
+            <button id="btn-replay2" class="btn-replay">もう一度プレイ</button>
+        </div>
+    </div>
+
+    <script src="sugoroku.js?v=20"></script>
+</body>
+</html>
