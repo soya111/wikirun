@@ -339,45 +339,34 @@ class GameUI {
         const resizer = document.getElementById('resizer');
         const screen = this.els.gameScreen;
         const frame = this.els.wikiFrame;
-        let dragging = false;
 
         const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
-        const onStart = (e) => {
-            dragging = true;
+        resizer.addEventListener('pointerdown', (e) => {
+            resizer.setPointerCapture(e.pointerId);
             resizer.classList.add('active');
             frame.style.pointerEvents = 'none';
             e.preventDefault();
-        };
+        });
 
-        const onMove = (e) => {
-            if (!dragging) return;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        resizer.addEventListener('pointermove', (e) => {
+            if (!resizer.hasPointerCapture(e.pointerId)) return;
+            if (e.cancelable) e.preventDefault();
 
             if (isMobile()) {
-                const h = Math.max(150, Math.min(clientY, window.innerHeight - 150));
+                const h = Math.max(150, Math.min(e.clientY, window.innerHeight - 150));
                 screen.style.gridTemplateRows = `${h}px 6px 1fr`;
             } else {
                 const w = screen.getBoundingClientRect().width;
-                const left = Math.max(300, Math.min(clientX, w - 200));
+                const left = Math.max(300, Math.min(e.clientX, w - 200));
                 screen.style.gridTemplateColumns = `${left}px 6px 1fr`;
             }
-        };
+        });
 
-        const onEnd = () => {
-            if (!dragging) return;
-            dragging = false;
+        resizer.addEventListener('pointerup', () => {
             resizer.classList.remove('active');
             frame.style.pointerEvents = '';
-        };
-
-        resizer.addEventListener('mousedown', onStart);
-        resizer.addEventListener('touchstart', onStart, { passive: false });
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('touchmove', onMove, { passive: false });
-        document.addEventListener('mouseup', onEnd);
-        document.addEventListener('touchend', onEnd);
+        });
     }
 
     hideConfirmButton() {
@@ -401,6 +390,12 @@ class GameUI {
             this.game = new GameState(board, endless ? Infinity : maxTurns);
             this.els.setup.style.display = 'none';
             this.els.gameScreen.classList.add('active');
+            // Keep screen awake during gameplay
+            if (navigator.wakeLock) {
+                navigator.wakeLock.request('screen').then(lock => {
+                    this._wakeLock = lock;
+                }).catch(() => {});
+            }
             this.renderBoard();
             this.renderScores();
             this.renderTimeline();
@@ -412,6 +407,10 @@ class GameUI {
     }
 
     reset() {
+        if (this._wakeLock) {
+            this._wakeLock.release().catch(() => {});
+            this._wakeLock = null;
+        }
         this.game = null;
         this.pendingMove = null;
         this.validLinks = new Set();
